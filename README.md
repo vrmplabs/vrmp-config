@@ -1,4 +1,4 @@
 vrmp-config
 ===========
 
-config files
+puppet config files and python scripts for puppet
