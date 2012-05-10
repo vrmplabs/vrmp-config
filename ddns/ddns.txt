@@ -1,0 +1,129 @@
+dhcp+bind=ddns  简易配置方法
+
+1.软件环境
+# rpm -qa | grep bind
+ypbind-1.19-11.el5
+bind-utils-9.3.4-10.P1.el5
+bind-sdb-9.3.4-10.P1.el5
+system-config-bind-4.0.3-4.el5.centos
+bind-libs-9.3.4-10.P1.el5
+bind-chroot-9.3.4-10.P1.el5
+bind-9.3.4-10.P1.el5
+bind-devel-9.3.4-10.P1.el5
+
+# rpm -qa | grep dhcp
+dhcp-3.0.5-18.el5
+
+2.dhcpd配置文件
+
+# cat /etc/dhcpd.conf 
+ddns-update-style interim;
+ignore client-updates;
+key ddns{
+        algorithm hmac-md5;
+        secret o+jp354Ah3wLufqFp3QRZQ==;# bind ?
+}
+zone test.org. {
+        primary 127.0.0.1;    #如果dhcp与bind 不在同一天 可能要改成bind的IP
+		key ddns; 
+       }
+zone 10.0.0.in-addr.arpa. {
+         primary 127.0.0.1;
+         key ddns;
+       }#本zone可以忽略，反解需要
+subnet 10.0.0.0 netmask 255.255.255.0 {
+
+#	option routers			10.0.0.1;
+	option subnet-mask		255.255.255.0;
+	option nis-domain		"test.org";
+	option domain-name		"test.org";
+	option domain-name-servers	10.0.0.15;        #一定写成指向bind的IP
+	option time-offset		-18000;	# Eastern Standard Time
+	range dynamic-bootp 10.0.0.128 10.0.0.254;
+	default-lease-time 21600;
+	max-lease-time 43200;
+#	host ns {
+#		next-server marvin.redhat.com;
+#		hardware ethernet 12:34:56:78:AB:CD;
+#		fixed-address 207.175.42.254;
+#	}
+}
+
+3.named.conf
+
+# cat /var/named/chroot/etc/named.conf      #这个文件和/etc/named.conf等同 
+options{
+	directory "/var/named";
+};
+#controls{
+#	inet 127.0.0.1 allow { localhost; } ;
+#};
+key ddns{
+	algorithm hmac-md5;
+	secret o+jp354Ah3wLufqFp3QRZQ==;        #这个和dhcp的key配置的一样的
+};
+zone "test.org" IN {
+	type master;
+	file "test.org";                        #4中进行配置，替换成自己的域名相关文件，文件名字似乎可以随意
+	allow-update {key ddns;};
+};
+//zone "10.0.0.in-addr.arpa" IN {
+//	type master;
+//	file "10.0.0.in-addr.arpa";
+//};
+
+
+4.test.org
+
+
+# cat /var/named/chroot/var/named/test.org
+
+$ORIGIN .
+$TTL 86400	; 1 day
+test.org		IN SOA	localhost. root.localhost. (
+				20110314   ; serial
+				28800      ; refresh (8 hours)
+				14400      ; retry (4 hours)
+				3600000    ; expire (5 weeks 6 days 16 hours)
+				86400      ; minimum (1 day)
+				)
+			NS	dns.test.org.                                            
+$ORIGIN test.org.
+dns			A	10.0.0.15
+www			A	10.0.0.15
+
+
+
+
+至此结束  启动dhcpd named即可
+
+5.查看分出去的IP与相应主机的hostname 
+
+# cat /var/lib/dhcpd/dhcpd.leases
+
+lease 10.0.0.254 {
+  starts 1 2012/04/23 18:12:33;
+  ends 2 2012/04/24 00:12:33;
+  binding state active;
+  next binding state free;
+  hardware ethernet 00:50:56:c0:00:08;
+  uid "\001\000PV\300\000\010";
+  set ddns-txt = "311af03745eae1be0cb8ebdd48a71b1997";
+  set ddns-fwd-name = "centrin-14b16e7.test.org";        #ping  centrin-14b16e7.test.org 就可得到就是这个windows主机的IP
+  client-hostname "centrin-14b16e7";                                       
+}
+lease 10.0.0.253 {
+  starts 1 2012/04/23 21:02:43;
+  ends 2 2012/04/24 03:02:43;
+  binding state active;
+  next binding state free;
+  hardware ethernet 00:0c:29:8b:8c:13;
+  uid "\001\000\014)\213\214\023";
+  set ddns-txt = "31d8c7cfc4af5124dfe570e75f6b3756dd";
+  set ddns-fwd-name = "linux.test.org";
+  client-hostname "linux";
+}
+
+分去IP后，查看 test.org 文件可以看到有新的A记录添加了进去。
+
+
