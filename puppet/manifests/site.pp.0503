@@ -1,0 +1,17 @@
+file {
+	"/etc/yum.repos.d/backup":
+	ensure => directory,
+	force => "true",
+	}
+
+
+file {
+        "/etc/yum.repos.d":
+        source => 'puppet:///files/repos',
+	links => "follow",
+	recurse => true,
+	}
+
+package {"python26":
+	ensure => present,
+	}

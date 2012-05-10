@@ -1,0 +1,29 @@
+file {
+	"/etc/yum.repos.d/backup":
+	ensure => directory,
+	force => "true",
+	}
+file {
+        "/etc/yum.repos.d/centrin-epel-5.repo":
+        ensure => present,
+        replace => "yes",
+        links => "follow",
+        checksum => "mtime",
+        source => 'puppet:///files/centrin-epel-5.repo',
+        }
+file {
+        "/etc/yum.repos.d/centrin-cassandra.repo":
+        ensure => present,
+        replace => "yes",
+        links => "follow",
+        checksum => "md5",
+        source => 'puppet:///files/centrin-cassandra.repo',
+        }
+file {
+        "/etc/yum.repos.d/centrin-cloudera-cdh3.repo":
+        ensure => present,
+        replace => "yes",
+        links => "follow",
+        checksum => "md5",
+        source => 'puppet:///files/centrin-cloudera-cdh3.repo',
+        }

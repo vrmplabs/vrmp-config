@@ -1,0 +1,5 @@
+[datastax]
+name= DataStax Repo for Apache Cassandra
+baseurl=http://172.16.10.51/cassandra
+enabled=1
+gpgcheck=0

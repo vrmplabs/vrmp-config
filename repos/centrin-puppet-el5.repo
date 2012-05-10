@@ -1,0 +1,8 @@
+[centrin-puppetlabs]
+name=Puppet Labs Packages
+baseurl=http://172.16.10.51/puppet/el/el5/5/products/x86_64
+enabled=1
+[centrin-puppetlabs-deps]
+name=Puppet Labs Packages
+baseurl=http://172.16.10.51/puppet/el/el5/5/dependencies/x86_64
+enabled=1
