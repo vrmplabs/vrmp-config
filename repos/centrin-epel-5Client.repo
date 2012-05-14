@@ -1,0 +1,4 @@
+[centrin-epel]
+name=fedora-epel
+baseurl=http://172.16.10.51/epel/5Client/x86_64
+gpgcheck=0

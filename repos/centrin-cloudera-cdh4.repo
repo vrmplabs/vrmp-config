@@ -1,0 +1,4 @@
+[centrin-cloudera-cdh4]
+name=Cloudera's Distribution for Hadoop, Version 4
+baseurl=http://172.16.10.51/hadoop/cdh4/4b2/
+gpgcheck=0 
