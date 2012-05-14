@@ -1,4 +1,4 @@
 [centrin-cloudera-cdh3]
 name=Cloudera's Distribution for Hadoop, Version 3
-baseurl=http://172.16.10.51/hadoop/3u3/
+baseurl=http://172.16.10.51/hadoop/cdh3/3u3/
 gpgcheck=0 

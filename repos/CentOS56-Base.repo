@@ -1,0 +1,4 @@
+[centrin-centos56-base]
+name=CentOS-5_x86-64-Base
+baseurl=http://172.16.10.51/centos56
+gpgcheck=0
